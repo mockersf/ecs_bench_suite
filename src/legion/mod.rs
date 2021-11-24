@@ -6,3 +6,4 @@ pub mod serialize_binary;
 pub mod serialize_text;
 pub mod simple_insert;
 pub mod simple_iter;
+pub mod parallel_light_compute;

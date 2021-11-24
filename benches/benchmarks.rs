@@ -145,6 +145,34 @@ fn bench_heavy_compute(c: &mut Criterion) {
     });
 }
 
+fn bench_parallel_light_compute(c: &mut Criterion) {
+    let mut group = c.benchmark_group("parallel_light_compute");
+    group.bench_function("legion", |b| {
+        let mut bench = legion::parallel_light_compute::Benchmark::new();
+        b.iter(move || bench.run());
+    });
+    group.bench_function("legion (packed)", |b| {
+        let mut bench = legion_packed::parallel_light_compute::Benchmark::new();
+        b.iter(move || bench.run());
+    });
+    group.bench_function("bevy", |b| {
+        let mut bench = bevy::parallel_light_compute::Benchmark::new();
+        b.iter(move || bench.run());
+    });
+    group.bench_function("hecs", |b| {
+        let mut bench = hecs::parallel_light_compute::Benchmark::new();
+        b.iter(move || bench.run());
+    });
+    group.bench_function("shipyard", |b| {
+        let mut bench = shipyard::parallel_light_compute::Benchmark::new();
+        b.iter(move || bench.run());
+    });
+    group.bench_function("specs", |b| {
+        let mut bench = specs::parallel_light_compute::Benchmark::new();
+        b.iter(move || bench.run());
+    });
+}
+
 fn bench_add_remove(c: &mut Criterion) {
     let mut group = c.benchmark_group("add_remove_component");
     group.bench_function("legion", |b| {
@@ -215,5 +243,6 @@ criterion_group!(
     bench_add_remove,
     bench_serialize_text,
     bench_serialize_binary,
+    bench_parallel_light_compute
 );
 criterion_main!(benchmarks);
