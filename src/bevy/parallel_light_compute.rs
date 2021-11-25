@@ -11,7 +11,7 @@ struct Rotation(Vector3<f32>);
 #[derive(Copy, Clone)]
 struct Velocity(Vector3<f32>);
 
-pub struct Benchmark(World);
+pub struct Benchmark(World, TaskPool);
 
 impl Benchmark {
     pub fn new() -> Self {
@@ -26,14 +26,13 @@ impl Benchmark {
             )
         }));
 
-        Self(world)
+        Self(world, TaskPool::new())
     }
 
     pub fn run(&mut self) {
-        let task_pool = TaskPool::new();
         let mut query = self.0.query::<(&mut Position, &mut Matrix4<f32>)>();
 
-        query.par_for_each_mut(&mut self.0, &task_pool, 64, |(mut pos, mut mat)| {
+        query.par_for_each_mut(&mut self.0, &self.1, 1024, |(mut pos, mut mat)| {
             *mat = mat.invert().unwrap();
             pos.0 = mat.transform_vector(pos.0);
         });
