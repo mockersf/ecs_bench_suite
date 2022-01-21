@@ -1,14 +1,20 @@
-use bevy_ecs::prelude::*;
+use bevy_ecs::{component::SparseStorage, prelude::*};
 
 macro_rules! create_entities {
     ($world:ident; $( $variants:ident ),*) => {
         $(
             struct $variants(f32);
+
+            impl Component for $variants {
+                type Storage = SparseStorage;
+            }
+
             $world.spawn_batch((0..20).map(|_| ($variants(0.0), Data(1.0))));
         )*
     };
 }
 
+#[derive(Component)]
 struct Data(f32);
 
 pub struct Benchmark(World);

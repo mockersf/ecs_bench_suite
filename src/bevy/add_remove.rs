@@ -1,7 +1,14 @@
-use bevy_ecs::prelude::*;
+use bevy_ecs::{component::SparseStorage, prelude::*};
 
 struct A(f32);
+impl Component for A {
+    type Storage = SparseStorage;
+}
+
 struct B(f32);
+impl Component for B {
+    type Storage = SparseStorage;
+}
 
 pub struct Benchmark(World, Vec<Entity>);
 
