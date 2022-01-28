@@ -1,13 +1,11 @@
-use bevy_ecs::{component::SparseStorage, prelude::*};
+use bevy_ecs::prelude::*;
 
 macro_rules! create_entities {
     ($world:ident; $( $variants:ident ),*) => {
         $(
+            #[derive(Component)]
+            #[component(storage = "SparseSet")]
             struct $variants(f32);
-
-            impl Component for $variants {
-                type Storage = SparseStorage;
-            }
 
             $world.spawn_batch((0..20).map(|_| ($variants(0.0), Data(1.0))));
         )*
@@ -17,21 +15,20 @@ macro_rules! create_entities {
 #[derive(Component)]
 struct Data(f32);
 
-pub struct Benchmark(World);
+pub struct Benchmark<'a>(World, QueryState<&'a mut Data>);
 
-impl Benchmark {
+impl Benchmark<'_> {
     pub fn new() -> Self {
         let mut world = World::default();
 
         create_entities!(world; A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z);
+        let query = world.query::<&mut Data>();
 
-        Self(world)
+        Self(world, query)
     }
 
     pub fn run(&mut self) {
-        let mut query = self.0.query::<&mut Data>();
-
-        for mut data in query.iter_mut(&mut self.0) {
+        for mut data in self.1.iter_mut(&mut self.0) {
             data.0 *= 2.0;
         }
     }

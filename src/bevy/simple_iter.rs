@@ -13,9 +13,9 @@ struct Rotation(Vector3<f32>);
 #[derive(Copy, Clone, Component)]
 struct Velocity(Vector3<f32>);
 
-pub struct Benchmark(World);
+pub struct Benchmark<'a>(World, QueryState<(&'a Velocity, &'a mut Position)>);
 
-impl Benchmark {
+impl Benchmark<'_> {
     pub fn new() -> Self {
         let mut world = World::new();
         world.spawn_batch((0..10_000).map(|_| {
@@ -27,13 +27,13 @@ impl Benchmark {
             )
         }));
 
-        Self(world)
+        let query = world.query::<(&Velocity, &mut Position)>();
+
+        Self(world, query)
     }
 
     pub fn run(&mut self) {
-        let mut query = self.0.query::<(&Velocity, &mut Position)>();
-
-        for (velocity, mut position) in query.iter_mut(&mut self.0) {
+        for (velocity, mut position) in self.1.iter_mut(&mut self.0) {
             position.0 += velocity.0;
         }
     }
